@@ -62,6 +62,15 @@ h1, h2, h3 {
     color: #2E86DE !important;
 }
 
+/* Header banner title - WHITE */
+.header-banner h1 {
+    color: white !important;
+}
+
+.header-banner p {
+    color: white !important;
+}
+
 /* ===== BUTTONS ===== */
 button {
     background-color: #2E86DE !important;
@@ -189,7 +198,7 @@ td {
 
 # Simple header - centered
 st.markdown("""
-<div style="background: linear-gradient(135deg, #2E86DE 0%, #0652DD 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+<div class="header-banner" style="background: linear-gradient(135deg, #2E86DE 0%, #0652DD 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
     <h1 style="color: white !important; margin: 0; font-weight: 600;">☁️ Cloud Infrastructure Development Platform</h1>
     <p style="color: white !important; margin: 5px 0 0 0; font-size: 16px;">Enterprise Multi-Account Cloud Management</p>
 </div>
