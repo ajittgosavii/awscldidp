@@ -727,46 +727,57 @@ class DesignPlanningModule:
         with workflow_tabs[0]:
             st.markdown("### Designs in Draft Status")
             
-            drafts = [
-                {"Name": "serverless-api", "Owner": "dev-team", "Created": "2024-12-06", "Days": "1"},
-                {"Name": "ml-pipeline", "Owner": "ml-team", "Created": "2024-12-05", "Days": "2"},
-                {"Name": "iot-platform", "Owner": "iot-team", "Created": "2024-12-04", "Days": "3"}
-            ]
+            drafts = st.session_state.designs.get('draft', [])
             
-            for draft in drafts:
-                with st.expander(f"📝 {draft['Name']} - {draft['Owner']}"):
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        st.write(f"**Created:** {draft['Created']}")
-                        st.write(f"**Days in Draft:** {draft['Days']}")
-                    
-                    with col2:
-                        if st.button("▶️ Continue Editing", key=f"edit_{draft['Name']}"):
-                            st.info("Opening design editor...")
-                        if st.button("🤖 Submit for WAF Review", key=f"waf_{draft['Name']}"):
-                            st.success(f"Submitted '{draft['Name']}' for WAF review!")
+            if not drafts:
+                st.info("📝 No drafts yet. Create a design and save as draft to see it here!")
+            else:
+                for draft in drafts:
+                    with st.expander(f"📝 {draft['name']} - {draft['owner']}"):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.write(f"**Category:** {draft['category']}")
+                            st.write(f"**Environment:** {draft['environment']}")
+                            st.write(f"**Created:** {draft['created']}")
+                            st.write(f"**Services:** {', '.join(draft['services'][:3])}...")
+                        
+                        with col2:
+                            st.write(f"**Description:**")
+                            st.write(draft['description'][:100] + "...")
+                        
+                        st.markdown("---")
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.button("▶️ Continue Editing", key=f"edit_{draft['id']}"):
+                                st.info("Opening design editor... (Feature coming soon)")
+                        
+                        with col2:
+                            if st.button("🤖 Submit for WAF Review", key=f"waf_{draft['id']}"):
+                                st.success(f"✅ Submitted '{draft['name']}' for WAF review!")
         
         with workflow_tabs[1]:
             st.markdown("### Designs in WAF Review")
             
-            st.info("🤖 AI is analyzing these designs against Well-Architected Framework...")
+            waf_reviews = st.session_state.designs.get('waf_review', [])
             
-            waf_reviews = [
-                {"Name": "api-backend", "Score": "Analyzing...", "Started": "2024-12-06"},
-                {"Name": "event-platform", "Score": "82/100", "Started": "2024-12-06"}
-            ]
-            
-            for review in waf_reviews:
-                with st.expander(f"🤖 {review['Name']} - Score: {review['Score']}"):
-                    if review['Score'] != "Analyzing...":
-                        st.success(f"WAF Analysis Complete: {review['Score']}")
+            if not waf_reviews:
+                st.info("🤖 No designs in WAF review. Submit a draft for WAF review to see it here!")
+            else:
+                st.info("🤖 AI is analyzing these designs against Well-Architected Framework...")
+                
+                for review in waf_reviews:
+                    with st.expander(f"🤖 {review['name']} - Analyzing..."):
+                        st.write(f"**Owner:** {review['owner']}")
+                        st.write(f"**Category:** {review['category']}")
+                        st.write(f"**Services:** {', '.join(review['services'])}")
                         
-                        if st.button("📊 View Analysis", key=f"view_{review['Name']}"):
-                            st.info("Loading detailed WAF analysis...")
+                        st.markdown("---")
+                        st.success("✅ WAF Analysis would be performed here (AI integration required)")
                         
-                        if st.button("➡️ Submit for Stakeholder Review", key=f"submit_{review['Name']}"):
-                            st.success(f"Submitted '{review['Name']}' for stakeholder review!")
+                        if st.button("➡️ Submit for Stakeholder Review", key=f"submit_{review['id']}"):
+                            st.success(f"✅ Submitted '{review['name']}' for stakeholder review!")
         
         with workflow_tabs[2]:
             st.markdown("### Designs in Stakeholder Review")
@@ -803,74 +814,64 @@ class DesignPlanningModule:
                         
                         st.markdown("---")
                         st.write(f"**Description:** {review['description']}")
-                    
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        if st.button("💬 View Comments", key=f"comments_{review['Name']}"):
-                            st.info("Opening comments thread...")
-                    
-                    with col2:
-                        if review['Status'].startswith("🟢"):
-                            if st.button("✅ Submit for Approval", key=f"approve_{review['Name']}"):
-                                st.success(f"Submitted '{review['Name']}' for management approval!")
+                        
+                        st.markdown("---")
+                        
+                        col1, col2, col3 = st.columns(3)
+                        
+                        with col1:
+                            if st.button("💬 View Comments", key=f"comments_{review['id']}"):
+                                st.info("Opening comments thread... (Feature coming soon)")
+                        
+                        with col2:
+                            if st.button("👥 Add Reviewers", key=f"reviewers_{review['id']}"):
+                                st.info("Adding reviewers... (Feature coming soon)")
+                        
+                        with col3:
+                            if st.button("✅ Submit for Approval", key=f"approve_{review['id']}"):
+                                st.success(f"✅ Submitted '{review['name']}' for management approval!")
         
         with workflow_tabs[3]:
             st.markdown("### Designs Pending Approval")
             
-            approvals = [
-                {
-                    "Name": "payment-gateway",
-                    "Owner": "payments-team",
-                    "Est Cost": "$2,400/mo",
-                    "Approver": "Engineering Director",
-                    "Submitted": "2024-12-05"
-                }
-            ]
+            approvals = st.session_state.designs.get('pending_approval', [])
             
-            for approval in approvals:
-                with st.expander(f"✅ {approval['Name']} - Pending: {approval['Approver']}"):
-                    st.write(f"**Owner:** {approval['Owner']}")
-                    st.write(f"**Estimated Cost:** {approval['Est Cost']}")
-                    st.write(f"**Submitted:** {approval['Submitted']}")
-                    
-                    st.markdown("**Approval Status:**")
-                    st.success("✅ Security Team - Approved")
-                    st.success("✅ Platform Team - Approved")
-                    st.warning("⏳ Engineering Director - Pending")
-                    
-                    if st.button("🔔 Send Reminder", key=f"remind_{approval['Name']}"):
-                        st.success("Reminder sent to approver!")
+            if not approvals:
+                st.info("✅ No designs pending approval. Submit a design from stakeholder review!")
+            else:
+                for approval in approvals:
+                    with st.expander(f"✅ {approval['name']} - Pending Approval"):
+                        st.write(f"**Owner:** {approval['owner']}")
+                        st.write(f"**Category:** {approval['category']}")
+                        st.write(f"**Created:** {approval['created']}")
+                        
+                        st.markdown("---")
+                        st.warning("⏳ Awaiting management approval...")
+                        
+                        if st.button("🚀 Approve & Deploy", key=f"deploy_{approval['id']}"):
+                            st.success(f"✅ Approved '{approval['name']}'! Ready for deployment!")
         
         with workflow_tabs[4]:
             st.markdown("### Approved Designs Ready for Deployment")
             
-            st.success("These designs are approved and ready for CI/CD integration!")
+            approved = st.session_state.designs.get('approved', [])
             
-            approved = [
-                {
-                    "Name": "prod-web-app",
-                    "Approved": "2024-12-03",
-                    "Approver": "CTO",
-                    "CI/CD": "✅ Pipeline Created"
-                },
-                {
-                    "Name": "analytics-platform",
-                    "Approved": "2024-12-02",
-                    "Approver": "VP Engineering",
-                    "CI/CD": "🚀 Deployed"
-                }
-            ]
-            
-            for item in approved:
-                with st.expander(f"🚀 {item['Name']} - {item['CI/CD']}"):
-                    st.write(f"**Approved:** {item['Approved']}")
-                    st.write(f"**Approver:** {item['Approver']}")
-                    st.write(f"**CI/CD Status:** {item['CI/CD']}")
-                    
-                    if item['CI/CD'] == "✅ Pipeline Created":
-                        if st.button("🚀 Deploy Now", key=f"deploy_{item['Name']}"):
-                            st.success("Triggering CI/CD pipeline for deployment!")
+            if not approved:
+                st.info("🚀 No approved designs yet. Approve designs from pending approval!")
+            else:
+                st.success(f"✅ {len(approved)} design(s) approved and ready for CI/CD integration!")
+                
+                for item in approved:
+                    with st.expander(f"🚀 {item['name']} - Ready for Deployment"):
+                        st.write(f"**Owner:** {item['owner']}")
+                        st.write(f"**Category:** {item['category']}")
+                        st.write(f"**Created:** {item['created']}")
+                        
+                        st.markdown("---")
+                        st.success("✅ Design approved - Ready for CI/CD pipeline integration!")
+                        
+                        if st.button("🚀 Deploy via CI/CD", key=f"cicd_{item['id']}"):
+                            st.success("Triggering CI/CD pipeline for deployment! (Feature coming soon)")
     
     # ========================================================================
     # TAB 4: BLUEPRINT LIBRARY
