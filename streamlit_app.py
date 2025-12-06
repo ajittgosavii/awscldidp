@@ -181,6 +181,36 @@ td {
 .stNumberInput > div {
     border-radius: 4px !important;
 }
+
+/* ===== SAFE NAVIGATION FIX - CSS ONLY ===== */
+/* Simple fix - no JavaScript to avoid breaking page */
+
+/* Make button containers wrap */
+[data-testid="stHorizontalBlock"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+}
+
+/* Set button width to force wrapping */
+[data-testid="stHorizontalBlock"] button,
+.stButton button {
+    flex: 0 0 auto !important;
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    [data-testid="stHorizontalBlock"] button,
+    .stButton button {
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+}
+/* ===== END SAFE NAVIGATION FIX ===== */
+
 </style>
 """, unsafe_allow_html=True)
 # ==================================================================================
