@@ -1,6 +1,6 @@
 """
 Module 0: Main Dashboard
-Enterprise overview of multi-account AWS environment with AWS theming
+FIXED VERSION - Light metric cards with VERIFICATION MARKER
 """
 
 import streamlit as st
@@ -11,14 +11,62 @@ from config_settings import AppConfig
 from core_account_manager import get_account_manager
 from core_session_manager import SessionManager
 from utils_helpers import Helpers
-from aws_theme import AWSTheme
+
+# ============================================================================
+# VERIFICATION: If you see "✅ FIXED VERSION DEPLOYED", this file is active!
+# ============================================================================
+
+def render_light_metric_FIXED(label: str, value: str, icon: str = ""):
+    """
+    FIXED VERSION - Render metric card with LIGHT background
+    100% GUARANTEED VISIBLE TEXT
+    """
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%);
+        border: 3px solid #0EA5E9;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 16px rgba(14, 165, 233, 0.2);
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    ">
+        <div style="
+            color: #0EA5E9;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+        ">
+            <span style="font-size: 24px; margin-right: 10px;">{icon}</span>
+            {label}
+        </div>
+        <div style="
+            color: #1E293B;
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+        ">
+            {value}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 class DashboardModule:
-    """Main dashboard with enterprise overview and AWS styling"""
+    """Main dashboard with enterprise overview - FIXED VERSION"""
     
     @staticmethod
     def render():
         """Render dashboard"""
+        
+        # ====================================================================
+        # VERIFICATION MARKER - If you see this, the FIXED version is deployed!
+        # ====================================================================
+        st.success("✅ **FIXED VERSION DEPLOYED!** - Light metric cards active")
+        st.caption(f"🕐 Deployment verification: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         st.markdown("## 🏠 Enterprise Cloud Dashboard")
         st.caption("Multi-account AWS environment overview with real-time metrics")
@@ -38,8 +86,8 @@ class DashboardModule:
             st.info("Go to **Account Lifecycle** → **Onboard Account** to add your first account.")
             return
         
-        # Top metrics with AWS styling
-        DashboardModule._render_top_metrics_aws(account_mgr, active_accounts)
+        # Top metrics - FIXED VERSION with light cards
+        DashboardModule._render_top_metrics_FIXED(account_mgr, active_accounts)
         
         st.markdown("---")
         
@@ -63,13 +111,13 @@ class DashboardModule:
         DashboardModule._render_recent_resources(account_mgr, active_accounts)
     
     @staticmethod
-    def _render_top_metrics_aws(account_mgr, active_accounts):
-        """Render top-level metrics with AWS theming"""
+    def _render_top_metrics_FIXED(account_mgr, active_accounts):
+        """Render top-level metrics - FIXED VERSION with LIGHT cards"""
         
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            AWSTheme.aws_metric_card(
+            render_light_metric_FIXED(
                 label="Connected Accounts",
                 value=str(len(active_accounts)),
                 icon="🔗"
@@ -93,7 +141,7 @@ class DashboardModule:
                 except:
                     pass
             
-            AWSTheme.aws_metric_card(
+            render_light_metric_FIXED(
                 label="Total Resources",
                 value=Helpers.format_number(total_resources) if total_resources > 0 else "N/A",
                 icon="📦"
@@ -102,7 +150,7 @@ class DashboardModule:
         with col3:
             # Estimated monthly cost
             estimated_cost = total_resources * 73  # $73/month per t3.micro
-            AWSTheme.aws_metric_card(
+            render_light_metric_FIXED(
                 label="Est. Monthly Cost",
                 value=Helpers.format_currency(estimated_cost),
                 icon="💰"
@@ -110,7 +158,7 @@ class DashboardModule:
         
         with col4:
             # Compliance score (placeholder)
-            AWSTheme.aws_metric_card(
+            render_light_metric_FIXED(
                 label="Compliance Score",
                 value="N/A",
                 icon="🛡️"
