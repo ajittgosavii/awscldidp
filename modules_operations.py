@@ -1,7 +1,8 @@
 """
-AI-Enhanced Operations Module
+AI-Enhanced Operations Module - FIXED
 Leveraging Anthropic Claude for intelligent operations, troubleshooting, and automation
 ENHANCED: Now includes Network Operations & Database Operations
+FIXED: All button keys guaranteed unique
 """
 
 import streamlit as st
@@ -9,12 +10,17 @@ import pandas as pd
 from datetime import datetime, timedelta
 from core_account_manager import get_account_manager, get_account_names
 import json
+import uuid
 
 # Import Network Operations Dashboard
 from network_operations_dashboard import NetworkOperationsDashboard
 
 # Import Database Operations Dashboard
 from database_operations_dashboard import DatabaseOperationsDashboard
+
+# Generate unique session ID for button keys
+if 'ops_session_id' not in st.session_state:
+    st.session_state.ops_session_id = str(uuid.uuid4())[:8]
 
 class OperationsModule:
     """AI-Enhanced Operations with Anthropic Claude"""
@@ -39,7 +45,7 @@ class OperationsModule:
         selected_account = st.selectbox(
             "Select AWS Account",
             options=account_names,
-            key="operations_account"
+            key=f"operations_account_{st.session_state.ops_session_id}"
         )
         
         if not selected_account:
@@ -133,7 +139,8 @@ class OperationsModule:
         cols = st.columns(2)
         for i, question in enumerate(sample_questions):
             with cols[i % 2]:
-                if st.button(f"💡 {question}", key=f"sample_ops_q_{i}", use_container_width=True):
+                # FIXED: Added session_id to ensure uniqueness
+                if st.button(f"💡 {question}", key=f"sample_ops_q_{i}_{st.session_state.ops_session_id}", use_container_width=True):
                     st.session_state.ops_query = question
         
         st.markdown("---")
@@ -144,16 +151,16 @@ class OperationsModule:
             value=st.session_state.get('ops_query', ''),
             placeholder="e.g., Stop all instances tagged Environment=Dev",
             height=100,
-            key="ops_query_input"
+            key=f"ops_query_input_{st.session_state.ops_session_id}"
         )
         
         col1, col2, col3 = st.columns([1, 1, 4])
         
         with col1:
-            ask_button = st.button("🤖 Ask Claude", type="primary", key="ops_ask_claude", use_container_width=True)
+            ask_button = st.button("🤖 Ask Claude", type="primary", key=f"ops_ask_claude_{st.session_state.ops_session_id}", use_container_width=True)
         
         with col2:
-            if st.button("🗑️ Clear Chat", key="ops_clear_chat", use_container_width=True):
+            if st.button("🗑️ Clear Chat", key=f"ops_clear_chat_{st.session_state.ops_session_id}", use_container_width=True):
                 st.session_state.ops_chat_history = []
                 st.session_state.ops_query = ''
                 st.rerun()
@@ -209,21 +216,22 @@ class OperationsModule:
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                if st.button("📋 Export Chat", key="ops_export_chat", use_container_width=True):
+                if st.button("📋 Export Chat", key=f"ops_export_chat_{st.session_state.ops_session_id}", use_container_width=True):
                     chat_export = json.dumps(st.session_state.ops_chat_history, default=str, indent=2)
                     st.download_button(
                         label="⬇️ Download JSON",
                         data=chat_export,
                         file_name=f"claude-ops-chat-{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-                        mime="application/json"
+                        mime="application/json",
+                        key=f"download_chat_{st.session_state.ops_session_id}"
                     )
             
             with col2:
-                if st.button("📊 Generate Report", key="ops_gen_report", use_container_width=True):
+                if st.button("📊 Generate Report", key=f"ops_gen_report_{st.session_state.ops_session_id}", use_container_width=True):
                     st.info("Generating comprehensive operations report...")
             
             with col3:
-                if st.button("🔧 Execute Actions", key="ops_exec_actions", use_container_width=True):
+                if st.button("🔧 Execute Actions", key=f"ops_exec_actions_{st.session_state.ops_session_id}", use_container_width=True):
                     st.warning("⚠️ Action execution requires confirmation")
     
     @staticmethod
@@ -447,9 +455,10 @@ What would you like to know more about?
                     'Medium': '#ffc107'
                 }[issue['severity']]
                 
+                # FIXED: Added session_id to ensure uniqueness
                 if st.button(
                     f"{issue['title']}",
-                    key=f"issue_{i}",
+                    key=f"issue_{i}_{st.session_state.ops_session_id}",
                     use_container_width=True,
                     help=issue['description']
                 ):
@@ -463,13 +472,13 @@ What would you like to know more about?
             value=st.session_state.get('troubleshoot_issue', ''),
             placeholder="e.g., My RDS database is slow and queries are timing out. Started happening 2 hours ago.",
             height=100,
-            key="troubleshoot_input"
+            key=f"troubleshoot_input_{st.session_state.ops_session_id}"
         )
         
         col1, col2 = st.columns([1, 4])
         
         with col1:
-            if st.button("🔍 Diagnose", type="primary", key="diagnose_btn", use_container_width=True):
+            if st.button("🔍 Diagnose", type="primary", key=f"diagnose_btn_{st.session_state.ops_session_id}", use_container_width=True):
                 if issue_description:
                     with st.spinner("🤖 Claude is analyzing the issue..."):
                         import time
@@ -525,7 +534,7 @@ Would you like me to execute these fixes automatically?
                         col1, col2, col3 = st.columns(3)
                         
                         with col1:
-                            if st.button("🚀 Auto-Fix", key="auto_fix_btn", use_container_width=True):
+                            if st.button("🚀 Auto-Fix", key=f"auto_fix_btn_{st.session_state.ops_session_id}", use_container_width=True):
                                 st.success("✅ Automated fix initiated!")
                                 st.info("Step 1/3: Terminating idle connections...")
                                 time.sleep(1)
@@ -538,11 +547,11 @@ Would you like me to execute these fixes automatically?
                                 st.success("✅ Issue resolved! Response time back to normal (175ms)")
                         
                         with col2:
-                            if st.button("📊 Detailed Report", key="detail_report_btn", use_container_width=True):
+                            if st.button("📊 Detailed Report", key=f"detail_report_btn_{st.session_state.ops_session_id}", use_container_width=True):
                                 st.info("Generating comprehensive analysis...")
                         
                         with col3:
-                            if st.button("📋 Create Ticket", key="create_ticket_btn", use_container_width=True):
+                            if st.button("📋 Create Ticket", key=f"create_ticket_btn_{st.session_state.ops_session_id}", use_container_width=True):
                                 st.success("Ticket created: OPS-2847")
         
         # Recent issues
@@ -669,7 +678,7 @@ Would you like me to execute these fixes automatically?
                     }
                 ]
                 
-                for rec in recommendations:
+                for idx, rec in enumerate(recommendations):
                     priority_color = {
                         'High': '#dc3545',
                         'Medium': '#ffc107',
@@ -681,7 +690,8 @@ Would you like me to execute these fixes automatically?
                         st.markdown(f"**Action:** {rec['action']}")
                         st.markdown(f"**Potential Savings:** {rec['savings']}")
                         
-                        if st.button(f"✅ Apply Recommendation", key=f"apply_{rec['instance']}"):
+                        # FIXED: Added index and session_id to ensure uniqueness
+                        if st.button(f"✅ Apply Recommendation", key=f"apply_{idx}_{st.session_state.ops_session_id}"):
                             st.success(f"Recommendation applied to {rec['instance']}")
                 
                 st.markdown("---")
@@ -724,20 +734,20 @@ Would you like me to execute these fixes automatically?
             model_type = st.selectbox(
                 "Model Type",
                 ["PyTorch", "TensorFlow", "XGBoost", "Scikit-learn", "HuggingFace"],
-                key="ml_model_type"
+                key=f"ml_model_type_{st.session_state.ops_session_id}"
             )
         
         with col2:
             instance_type = st.selectbox(
                 "Instance Type",
                 ["ml.t3.medium", "ml.m5.large", "ml.p3.2xlarge", "ml.inf1.xlarge"],
-                key="ml_instance_type"
+                key=f"ml_instance_type_{st.session_state.ops_session_id}"
             )
         
-        model_name = st.text_input("Model Name", placeholder="my-model-v1")
-        s3_path = st.text_input("S3 Model Path", placeholder="s3://my-bucket/models/my-model.tar.gz")
+        model_name = st.text_input("Model Name", placeholder="my-model-v1", key=f"ml_model_name_{st.session_state.ops_session_id}")
+        s3_path = st.text_input("S3 Model Path", placeholder="s3://my-bucket/models/my-model.tar.gz", key=f"ml_s3_path_{st.session_state.ops_session_id}")
         
-        if st.button("🚀 Deploy Model", type="primary", key="deploy_ml_model"):
+        if st.button("🚀 Deploy Model", type="primary", key=f"deploy_ml_model_{st.session_state.ops_session_id}"):
             if model_name and s3_path:
                 with st.spinner("Deploying model..."):
                     import time
@@ -871,7 +881,7 @@ Would you like me to execute these fixes automatically?
             }
         ]
         
-        for pred in predictions:
+        for idx, pred in enumerate(predictions):
             severity_color = {
                 'Critical': '#dc3545',
                 'High': '#fd7e14',
@@ -894,13 +904,14 @@ Would you like me to execute these fixes automatically?
                     st.markdown(f"- **ROI:** {int((float(pred['Outage Cost'].replace('$','').replace(',','')) / max(float(pred['Prevention Cost'].replace('$','').replace('/month','')), 1)) * 100)}%")
                 
                 with col2:
-                    if st.button(f"🔧 Auto-Fix", key=f"fix_{pred['Resource']}", use_container_width=True):
+                    # FIXED: Added index and session_id to ensure uniqueness
+                    if st.button(f"🔧 Auto-Fix", key=f"fix_{idx}_{st.session_state.ops_session_id}", use_container_width=True):
                         st.success(f"✅ Preventive action scheduled for {pred['Resource']}")
                     
-                    if st.button(f"📊 Details", key=f"details_{pred['Resource']}", use_container_width=True):
+                    if st.button(f"📊 Details", key=f"details_{idx}_{st.session_state.ops_session_id}", use_container_width=True):
                         st.info("Showing detailed analysis...")
                     
-                    if st.button(f"⏸️ Snooze", key=f"snooze_{pred['Resource']}", use_container_width=True):
+                    if st.button(f"⏸️ Snooze", key=f"snooze_{idx}_{st.session_state.ops_session_id}", use_container_width=True):
                         st.warning("Snoozed for 24 hours")
     
     @staticmethod
@@ -915,10 +926,10 @@ Would you like me to execute these fixes automatically?
             "Describe what you want to automate:",
             placeholder="e.g., Every night at 2 AM, stop all instances tagged Environment=Dev, take snapshots of production databases, and send a Slack notification when done",
             height=100,
-            key="runbook_description"
+            key=f"runbook_description_{st.session_state.ops_session_id}"
         )
         
-        if st.button("🤖 Generate Runbook", type="primary", key="ops_gen_runbook"):
+        if st.button("🤖 Generate Runbook", type="primary", key=f"ops_gen_runbook_{st.session_state.ops_session_id}"):
             if runbook_description:
                 with st.spinner("Claude is creating your runbook..."):
                     import time
@@ -971,15 +982,15 @@ steps:
                     col1, col2, col3 = st.columns(3)
                     
                     with col1:
-                        if st.button("💾 Save Runbook", key="ops_save_rb", use_container_width=True):
+                        if st.button("💾 Save Runbook", key=f"ops_save_rb_{st.session_state.ops_session_id}", use_container_width=True):
                             st.success("Runbook saved to automation library")
                     
                     with col2:
-                        if st.button("▶️ Test Run", key="ops_test_run", use_container_width=True):
+                        if st.button("▶️ Test Run", key=f"ops_test_run_{st.session_state.ops_session_id}", use_container_width=True):
                             st.info("Executing test run in dry-run mode...")
                     
                     with col3:
-                        if st.button("🚀 Deploy", key="ops_deploy_rb", use_container_width=True):
+                        if st.button("🚀 Deploy", key=f"ops_deploy_rb_{st.session_state.ops_session_id}", use_container_width=True):
                             st.success("Runbook deployed and scheduled!")
         
         # Existing runbooks
