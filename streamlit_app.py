@@ -44,7 +44,12 @@ st.markdown("""
 }
 
 /* All text - BLACK */
-body, p, span, div, label, h1, h2, h3, h4, h5, h6 {
+body, p, span, div, label, h2, h3, h4, h5, h6 {
+    color: black !important;
+}
+
+/* Main content h1 only - not header */
+.main h1:not(.header-title) {
     color: black !important;
 }
 
@@ -58,7 +63,16 @@ body, p, span, div, label, h1, h2, h3, h4, h5, h6 {
 }
 
 /* ===== HEADERS ===== */
-h1, h2, h3 {
+/* Header banner title - MUST BE WHITE */
+.header-title {
+    color: #FFFFFF !important;
+    text-shadow: none !important;
+}
+
+/* Main content headers only - not the banner header */
+.main h1:not(.header-title),
+.main h2,
+.main h3 {
     color: #2E86DE !important;
 }
 
@@ -187,11 +201,11 @@ td {
 # END SIMPLE BLUE THEME
 # ==================================================================================
 
-# Simple header - centered
+# Simple header - centered with WHITE text
 st.markdown("""
 <div style="background: linear-gradient(135deg, #2E86DE 0%, #0652DD 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
-    <h1 style="color: white !important; margin: 0; font-weight: 600;">☁️ Multi Cloud Infrastructure Intelligence Platform (MCIP)</h1>
-    <p style="color: white !important; margin: 5px 0 0 0; font-size: 16px;">Enterprise Multi-Account Cloud Management</p>
+    <h1 class="header-title" style="color: #FFFFFF !important; margin: 0; font-weight: 600; text-shadow: none;">☁️ Multi Cloud Infrastructure Intelligence Platform (MCIP)</h1>
+    <p style="color: #FFFFFF !important; margin: 5px 0 0 0; font-size: 16px; text-shadow: none;">Enterprise Multi-Account Cloud Management</p>
 </div>
 """, unsafe_allow_html=True)
 
