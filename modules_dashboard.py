@@ -1,6 +1,6 @@
 """
 Module 0: Main Dashboard
-FIXED VERSION - Light metric cards with VERIFICATION MARKER
+Enterprise multi-account cloud management dashboard
 """
 
 import streamlit as st
@@ -12,14 +12,10 @@ from core_account_manager import get_account_manager
 from core_session_manager import SessionManager
 from utils_helpers import Helpers
 
-# ============================================================================
-# VERIFICATION: If you see "✅ FIXED VERSION DEPLOYED", this file is active!
-# ============================================================================
-
 def render_light_metric_FIXED(label: str, value: str, icon: str = ""):
     """
-    FIXED VERSION - Render metric card with LIGHT background
-    100% GUARANTEED VISIBLE TEXT
+    Render metric card with light background and high-contrast text
+    Optimized for visibility and professional appearance
     """
     st.markdown(f"""
     <div style="
@@ -56,17 +52,11 @@ def render_light_metric_FIXED(label: str, value: str, icon: str = ""):
     """, unsafe_allow_html=True)
 
 class DashboardModule:
-    """Main dashboard with enterprise overview - FIXED VERSION"""
+    """Main dashboard with enterprise overview"""
     
     @staticmethod
     def render():
         """Render dashboard"""
-        
-        # ====================================================================
-        # VERIFICATION MARKER - If you see this, the FIXED version is deployed!
-        # ====================================================================
-        st.success("✅ **FIXED VERSION DEPLOYED!** - Light metric cards active")
-        st.caption(f"🕐 Deployment verification: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         st.markdown("## 🏠 Enterprise Cloud Dashboard")
         st.caption("Multi-account AWS environment overview with real-time metrics")
@@ -112,7 +102,7 @@ class DashboardModule:
     
     @staticmethod
     def _render_top_metrics_FIXED(account_mgr, active_accounts):
-        """Render top-level metrics - FIXED VERSION with LIGHT cards"""
+        """Render top-level metrics with light card styling"""
         
         col1, col2, col3, col4 = st.columns(4)
         
