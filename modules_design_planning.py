@@ -47,6 +47,73 @@ except ImportError:
     STORAGE_ADAPTER_AVAILABLE = False
 
 
+# ============================================================================
+# SESSION STATE MANAGEMENT
+# ============================================================================
+
+import uuid
+
+def initialize_design_state():
+    """Initialize session state for design management"""
+    if 'designs' not in st.session_state:
+        st.session_state.designs = {
+            'draft': [],
+            'waf_review': [],
+            'stakeholder_review': [
+                # Pre-populate with 2 existing designs
+                {
+                    'id': str(uuid.uuid4()),
+                    'name': 'data-lake',
+                    'owner': 'data-team',
+                    'category': 'Data Platform',
+                    'environment': 'Production',
+                    'description': 'Enterprise data lake platform',
+                    'services': ['S3', 'Glue', 'Athena'],
+                    'reviewers': ['security-team', 'platform-team'],
+                    'comments': 3,
+                    'approval_status': '🟡 Feedback Pending',
+                    'created': '2024-12-06',
+                    'status': 'stakeholder_review'
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'name': 'mobile-backend',
+                    'owner': 'mobile-team',
+                    'category': 'API Backend',
+                    'environment': 'Production',
+                    'description': 'Mobile app backend API',
+                    'services': ['API Gateway', 'Lambda', 'DynamoDB'],
+                    'reviewers': ['backend-team', 'devops-team'],
+                    'comments': 7,
+                    'approval_status': '🟢 Approved by 2/2',
+                    'created': '2024-12-06',
+                    'status': 'stakeholder_review'
+                }
+            ],
+            'pending_approval': [],
+            'approved': []
+        }
+
+def add_design(design_data: dict, status: str = 'draft'):
+    """Add a new design to session state"""
+    design_data['id'] = str(uuid.uuid4())
+    design_data['created'] = datetime.now().strftime('%Y-%m-%d')
+    design_data['status'] = status
+    design_data['reviewers'] = []
+    design_data['comments'] = 0
+    design_data['approval_status'] = ''
+    
+    if status not in st.session_state.designs:
+        st.session_state.designs[status] = []
+    
+    st.session_state.designs[status].append(design_data)
+    return design_data['id']
+
+def get_design_count(status: str) -> int:
+    """Get count of designs in a specific status"""
+    return len(st.session_state.designs.get(status, []))
+
+
 @st.cache_resource
 def get_anthropic_client():
     """Initialize and cache Anthropic client"""
@@ -245,6 +312,9 @@ class DesignPlanningModule:
     @staticmethod
     def render():
         """Render the Design & Planning module"""
+        # Initialize session state
+        initialize_design_state()
+        
         st.title("📐 Design & Planning - Well-Architected Framework")
         st.caption("🤖 AI-powered architecture design with comprehensive workflow and CI/CD integration")
         
@@ -500,8 +570,13 @@ class DesignPlanningModule:
                                     st.success(f"{i}. {opt}")
                     
                     elif submit_review:
+                        # Store the design in session state
+                        design_id = add_design(architecture, 'stakeholder_review')
                         st.success(f"✅ Architecture '{arch_name}' submitted for stakeholder review!")
+                        st.info(f"Design ID: {design_id}")
                         st.info("Status: Stakeholder Review - Awaiting feedback from team members")
+                        st.info("👉 Go to the **Design Workflow** tab to see your design!")
+                        st.balloons()
     
     # ========================================================================
     # TAB 2: WAF DASHBOARD
@@ -633,13 +708,20 @@ class DesignPlanningModule:
         **Phase 5: CI/CD Integration** → Auto-deploy via pipeline  
         """)
         
-        # Workflow status tabs
+        # Get live counts
+        draft_count = get_design_count('draft')
+        waf_count = get_design_count('waf_review')
+        stakeholder_count = get_design_count('stakeholder_review')
+        approval_count = get_design_count('pending_approval')
+        approved_count = get_design_count('approved')
+        
+        # Workflow status tabs with live counts
         workflow_tabs = st.tabs([
-            "📝 Draft (3)",
-            "🤖 WAF Review (2)",
-            "👥 Stakeholder Review (4)",
-            "✅ Pending Approval (2)",
-            "🚀 Approved (15)"
+            f"📝 Draft ({draft_count})",
+            f"🤖 WAF Review ({waf_count})",
+            f"👥 Stakeholder Review ({stakeholder_count})",
+            f"✅ Pending Approval ({approval_count})",
+            f"🚀 Approved ({approved_count})"
         ])
         
         with workflow_tabs[0]:
@@ -689,28 +771,38 @@ class DesignPlanningModule:
         with workflow_tabs[2]:
             st.markdown("### Designs in Stakeholder Review")
             
-            reviews = [
-                {
-                    "Name": "data-lake",
-                    "Owner": "data-team",
-                    "Reviewers": ["security-team", "platform-team"],
-                    "Comments": 3,
-                    "Status": "🟡 Feedback Pending"
-                },
-                {
-                    "Name": "mobile-backend",
-                    "Owner": "mobile-team",
-                    "Reviewers": ["backend-team", "devops-team"],
-                    "Comments": 7,
-                    "Status": "🟢 Approved by 2/2"
-                }
-            ]
+            # Get designs from session state
+            reviews = st.session_state.designs.get('stakeholder_review', [])
             
-            for review in reviews:
-                with st.expander(f"👥 {review['Name']} - {review['Status']}"):
-                    st.write(f"**Owner:** {review['Owner']}")
-                    st.write(f"**Reviewers:** {', '.join(review['Reviewers'])}")
-                    st.write(f"**Comments:** {review['Comments']}")
+            if not reviews:
+                st.info("👥 No designs in stakeholder review yet!")
+                st.info("💡 Create a design and submit it to see it here!")
+            else:
+                st.success(f"✅ Found {len(reviews)} design(s) in stakeholder review!")
+                
+                for review in reviews:
+                    # Determine status display
+                    status_display = review.get('approval_status', '🟡 Feedback Pending')
+                    
+                    with st.expander(f"👥 {review['name']} - {status_display}"):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.write(f"**Owner:** {review['owner']}")
+                            st.write(f"**Category:** {review.get('category', 'N/A')}")
+                            st.write(f"**Environment:** {review.get('environment', 'N/A')}")
+                            st.write(f"**Created:** {review['created']}")
+                        
+                        with col2:
+                            st.write(f"**Services:** {', '.join(review['services'])}")
+                            if review.get('reviewers'):
+                                st.write(f"**Reviewers:** {', '.join(review['reviewers'])}")
+                            else:
+                                st.write(f"**Reviewers:** None assigned yet")
+                            st.write(f"**Comments:** {review.get('comments', 0)}")
+                        
+                        st.markdown("---")
+                        st.write(f"**Description:** {review['description']}")
                     
                     col1, col2 = st.columns(2)
                     
