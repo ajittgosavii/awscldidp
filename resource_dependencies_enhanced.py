@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from typing import Dict, List
 
-def render_resource_dependencies_enhanced(session, region: str):
+def render_resource_dependencies_enhanced(account_mgr):
     """Enhanced resource dependencies with application selector - REAL MODE READY"""
     
     st.markdown("### 🔗 Resource Dependencies & Relationships")
@@ -591,11 +591,11 @@ def get_application_dependencies(application_name: str, session, region: str):
 # USAGE IN YOUR MODULE
 # ========================================================================
 
-# To replace the existing _render_dependencies method in your module:
+# To replace the existing _render_resource_dependencies method in your module:
 # 
-# Simply replace this section (around line 1254):
+# Simply replace this section (around line 1253):
 #
 # @staticmethod
-# def _render_dependencies(session, region: str):
-#     render_resource_dependencies_enhanced(session, region)
+# def _render_resource_dependencies(account_mgr):
+#     render_resource_dependencies_enhanced(account_mgr)
 #
