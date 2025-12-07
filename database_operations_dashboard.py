@@ -69,7 +69,8 @@ class PerformanceOptimizer:
         
         with col2:
             auto_refresh = st.checkbox("Auto-refresh", value=False, 
-                                      help="Auto-refresh every 60 seconds")
+                                      help="Auto-refresh every 60 seconds",
+                                      key=f"auto_refresh_db_{st.session_state.db_ops_session_id}")
             if auto_refresh:
                 st.caption("🔄 Auto-refresh: ON")
 
@@ -731,7 +732,8 @@ class DatabaseOperationsDashboard:
             selected_db_name = st.selectbox(
                 "RDS Instance",
                 rds_names,
-                help="Select RDS database to monitor"
+                help="Select RDS database to monitor",
+                key=f"select_rds_{st.session_state.db_ops_session_id}"
             )
             
             db = next((db for db in inventory['rds_instances'] if db['name'] == selected_db_name), None)
@@ -897,7 +899,8 @@ class DatabaseOperationsDashboard:
             selected_cluster_name = st.selectbox(
                 "AlwaysOn Cluster",
                 cluster_names,
-                help="Select SQL AlwaysOn cluster to monitor"
+                help="Select SQL AlwaysOn cluster to monitor",
+                key=f"select_cluster_{st.session_state.db_ops_session_id}"
             )
             
             cluster = next((c for c in inventory['sql_alwayson_clusters'] 
@@ -1192,7 +1195,8 @@ class DatabaseOperationsDashboard:
         priority_filter = st.multiselect(
             "Filter by Priority",
             ['Critical', 'High', 'Medium', 'Low'],
-            default=['Critical', 'High']
+            default=['Critical', 'High'],
+            key=f"priority_filter_{st.session_state.db_ops_session_id}"
         )
         
         # Display predictions
@@ -1252,7 +1256,8 @@ class DatabaseOperationsDashboard:
         
         with col2:
             auto_enabled = st.checkbox("Enable Auto-Remediation", value=True,
-                                      help="Allow AI to automatically fix predicted issues")
+                                      help="Allow AI to automatically fix predicted issues",
+                                      key=f"auto_remediation_db_{st.session_state.db_ops_session_id}")
         
         if auto_enabled:
             st.success("✅ **Auto-Remediation is ACTIVE** - AI will automatically fix detected issues")
