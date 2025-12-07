@@ -18,16 +18,17 @@ from network_operations_dashboard import NetworkOperationsDashboard
 # Import Database Operations Dashboard
 from database_operations_dashboard import DatabaseOperationsDashboard
 
-# Generate unique session ID for button keys
-if 'ops_session_id' not in st.session_state:
-    st.session_state.ops_session_id = str(uuid.uuid4())[:8]
-
 class OperationsModule:
     """AI-Enhanced Operations with Anthropic Claude"""
     
     @staticmethod
     def render():
         """Main render method - ENHANCED with Network & Database Operations"""
+        
+        # Generate unique session ID for button keys (must be inside render method)
+        if 'ops_session_id' not in st.session_state:
+            st.session_state.ops_session_id = str(uuid.uuid4())[:8]
+        
         st.title("⚙️ AI-Enhanced Operations")
         st.markdown("**Intelligent Operations powered by Anthropic Claude** - AI assistant, predictive maintenance, smart automation, comprehensive vulnerability management, network monitoring, and database observability")
         
