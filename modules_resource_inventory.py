@@ -1250,8 +1250,10 @@ aws lambda tag-resource --resource arn:aws:lambda:us-east-1:123456789:function:l
     # ========================================================================
     
     @staticmethod
-    def _render_resource_dependencies(account_mgr):
-        """Render resource dependencies and relationships"""
+    def _render_dependencies(session, region: str):
+        """Enhanced resource dependencies with application selector"""
+        from resource_dependencies_enhanced import render_resource_dependencies_enhanced
+        render_resource_dependencies_enhanced(session, region)
         
         st.markdown("### 🔗 Resource Dependencies & Relationships")
         st.caption("Visualize connections between resources")
