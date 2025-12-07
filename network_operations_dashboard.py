@@ -69,7 +69,8 @@ class PerformanceOptimizer:
         
         with col2:
             auto_refresh = st.checkbox("Auto-refresh", value=False, 
-                                      help="Auto-refresh every 60 seconds")
+                                      help="Auto-refresh every 60 seconds",
+                                      key=f"auto_refresh_net_{st.session_state.net_ops_session_id}")
             if auto_refresh:
                 st.caption("🔄 Auto-refresh: ON")
 
@@ -616,7 +617,8 @@ class NetworkOperationsDashboard:
             selected_dc = st.selectbox(
                 "Source Data Center",
                 dc_names,
-                help="Select your on-premises data center"
+                help="Select your on-premises data center",
+                key=f"select_dc_{st.session_state.net_ops_session_id}"
             )
         
         with col2:
@@ -624,7 +626,8 @@ class NetworkOperationsDashboard:
             selected_region = st.selectbox(
                 "Destination AWS Region",
                 region_names,
-                help="Select target AWS region"
+                help="Select target AWS region",
+                key=f"select_region_{st.session_state.net_ops_session_id}"
             )
         
         # Find matching VPN connection
@@ -765,7 +768,8 @@ class NetworkOperationsDashboard:
         
         dx_names = [dx['name'] for dx in topology['dx_connections']]
         if dx_names:
-            selected_dx_name = st.selectbox("Direct Connect Connection", dx_names)
+            selected_dx_name = st.selectbox("Direct Connect Connection", dx_names,
+                                           key=f"select_dx_{st.session_state.net_ops_session_id}")
             
             dx = next((dx for dx in topology['dx_connections'] if dx['name'] == selected_dx_name), None)
             
@@ -906,17 +910,20 @@ class NetworkOperationsDashboard:
         
         with col1:
             sources = [dc['name'] for dc in topology['data_centers']]
-            selected_source = st.selectbox("Source", sources)
+            selected_source = st.selectbox("Source", sources,
+                                          key=f"select_source_{st.session_state.net_ops_session_id}")
         
         with col2:
             destinations = [r['name'] for r in topology['aws_regions']]
-            selected_dest = st.selectbox("Destination", destinations)
+            selected_dest = st.selectbox("Destination", destinations,
+                                        key=f"select_dest_{st.session_state.net_ops_session_id}")
         
         # Time range
         time_range = st.selectbox(
             "Time Range",
             ["Last Hour", "Last 6 Hours", "Last 24 Hours", "Last 7 Days", "Last 30 Days"],
-            index=2
+            index=2,
+            key=f"time_range_{st.session_state.net_ops_session_id}"
         )
         
         # Generate metrics
@@ -1067,7 +1074,8 @@ class NetworkOperationsDashboard:
         severity_filter = st.multiselect(
             "Filter by Severity",
             ['Critical', 'Warning', 'Info'],
-            default=['Critical', 'Warning']
+            default=['Critical', 'Warning'],
+            key=f"severity_filter_{st.session_state.net_ops_session_id}"
         )
         
         # Display alerts
