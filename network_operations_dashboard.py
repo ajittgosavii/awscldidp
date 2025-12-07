@@ -58,7 +58,7 @@ class PerformanceOptimizer:
         col1, col2, col3 = st.columns([1, 1, 4])
         
         with col1:
-            if st.button("🔄 Refresh", use_container_width=True):
+            if st.button("🔄 Refresh", key=f"refresh_{st.session_state.net_ops_session_id}", use_container_width=True):
                 if cache_keys:
                     for key in cache_keys:
                         if key in st.session_state:
@@ -419,6 +419,11 @@ class NetworkOperationsDashboard:
     def render(account_mgr):
         """Render network operations dashboard"""
         
+
+        # Initialize unique session ID for button keys
+        if "net_ops_session_id" not in st.session_state:
+            st.session_state.net_ops_session_id = str(__import__("uuid").uuid4())[:8]
+
         st.markdown("## 🌐 Network Operations & Connectivity")
         st.caption("Real-time monitoring of VPN, Direct Connect, and network health using AWS CloudWatch")
         
@@ -727,15 +732,15 @@ class NetworkOperationsDashboard:
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                if st.button("🔄 Reset Tunnel", use_container_width=True):
+                if st.button("🔄 Reset Tunnel", key=f"reset_tunnel_{st.session_state.net_ops_session_id}", use_container_width=True):
                     st.info("Initiating tunnel reset...")
             
             with col2:
-                if st.button("📊 View Detailed Metrics", use_container_width=True):
+                if st.button("📊 View Detailed Metrics", key=f"view_detailed_metrics_{st.session_state.net_ops_session_id}", use_container_width=True):
                     st.info("Opening CloudWatch dashboard...")
             
             with col3:
-                if st.button("🔔 Configure Alerts", use_container_width=True):
+                if st.button("🔔 Configure Alerts", key=f"configure_alerts_{st.session_state.net_ops_session_id}", use_container_width=True):
                     st.info("Opening CloudWatch Alarms...")
         
         else:
@@ -864,15 +869,15 @@ class NetworkOperationsDashboard:
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    if st.button("📊 CloudWatch Dashboard", use_container_width=True):
+                    if st.button("📊 CloudWatch Dashboard", key=f"cloudwatch_dashboard_{st.session_state.net_ops_session_id}", use_container_width=True):
                         st.info("Opening DX CloudWatch dashboard...")
                 
                 with col2:
-                    if st.button("🔔 Configure Alarms", use_container_width=True):
+                    if st.button("🔔 Configure Alarms", key=f"configure_alarms_{st.session_state.net_ops_session_id}", use_container_width=True):
                         st.info("Opening CloudWatch Alarms...")
                 
                 with col3:
-                    if st.button("📄 Download Report", use_container_width=True):
+                    if st.button("📄 Download Report", key=f"download_report_{st.session_state.net_ops_session_id}", use_container_width=True):
                         st.info("Generating DX performance report...")
         
         else:
@@ -1213,7 +1218,7 @@ class NetworkOperationsDashboard:
         
         st.dataframe(df, use_container_width=True, hide_index=True)
         
-        if st.button("📥 Export Audit Log"):
+        if st.button("📥 Export Audit Log", key=f"export_audit_log_{st.session_state.net_ops_session_id}"):
             csv = df.to_csv(index=False)
             st.download_button(
                 "Download CSV",
