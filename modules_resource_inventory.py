@@ -1288,23 +1288,27 @@ aws lambda tag-resource --resource arn:aws:lambda:us-east-1:123456789:function:l
         st.markdown("---")
         st.markdown("#### 🎯 Select Application or Resource")
         
+        # Check global mode from session state (controlled by sidebar)
+        global_mode = st.session_state.get('mode', 'Demo')
+        
+        # Display current mode indicator
         col1, col2, col3 = st.columns([2, 2, 1])
         
         with col1:
-            # View mode selection
-            view_mode = st.radio(
-                "View Mode",
-                ["Demo Mode", "Real Mode"],
-                horizontal=True,
-                key="dep_view_mode",
-                help="Demo Mode: Sample data | Real Mode: Your actual AWS resources"
-            )
+            # Show current mode (read-only indicator)
+            if global_mode == 'Demo':
+                st.info("🎯 **Current Mode:** Demo Mode - Using sample applications")
+            else:
+                st.success("🔴 **Current Mode:** Real AWS Account - Your actual resources")
+        
+        with col3:
+            st.caption("💡 Change mode in sidebar")
         
         # ================================================================
         # DEMO MODE - Sample Applications
         # ================================================================
         
-        if view_mode == "Demo Mode":
+        if st.session_state.get('mode', 'Demo') == 'Demo':
             # Define sample applications with their dependencies
             demo_applications = {
                 "Production Web Application": [
