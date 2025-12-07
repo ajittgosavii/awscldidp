@@ -58,7 +58,7 @@ class PerformanceOptimizer:
         col1, col2, col3 = st.columns([1, 1, 4])
         
         with col1:
-            if st.button("🔄 Refresh", use_container_width=True):
+            if st.button("🔄 Refresh", key=f"refresh_{st.session_state.db_ops_session_id}", use_container_width=True):
                 if cache_keys:
                     for key in cache_keys:
                         if key in st.session_state:
@@ -506,6 +506,11 @@ class DatabaseOperationsDashboard:
     def render(account_mgr):
         """Render database operations dashboard"""
         
+
+        # Initialize unique session ID for button keys
+        if "db_ops_session_id" not in st.session_state:
+            st.session_state.db_ops_session_id = str(__import__("uuid").uuid4())[:8]
+
         st.markdown("## 🗄️ Database Operations & AI Observability")
         st.caption("Real-time monitoring, predictive analysis, and auto-remediation for RDS and SQL AlwaysOn")
         
@@ -853,19 +858,19 @@ class DatabaseOperationsDashboard:
                 col1, col2, col3, col4 = st.columns(4)
                 
                 with col1:
-                    if st.button("📊 View CloudWatch", use_container_width=True):
+                    if st.button("📊 View CloudWatch", key=f"view_cloudwatch_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.info("Opening CloudWatch dashboard...")
                 
                 with col2:
-                    if st.button("📸 Create Snapshot", use_container_width=True):
+                    if st.button("📸 Create Snapshot", key=f"create_snapshot_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.success("Snapshot initiated...")
                 
                 with col3:
-                    if st.button("🔄 Modify Instance", use_container_width=True):
+                    if st.button("🔄 Modify Instance", key=f"modify_instance_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.info("Opening modification wizard...")
                 
                 with col4:
-                    if st.button("⚡ Enable Auto-Fix", use_container_width=True):
+                    if st.button("⚡ Enable Auto-Fix", key=f"enable_auto_fix_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.success("Auto-remediation enabled!")
         
         else:
@@ -1043,19 +1048,19 @@ class DatabaseOperationsDashboard:
                 col1, col2, col3, col4 = st.columns(4)
                 
                 with col1:
-                    if st.button("🔄 Test Failover", use_container_width=True):
+                    if st.button("🔄 Test Failover", key=f"test_failover_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.warning("⚠️ Failover test will cause brief interruption!")
                 
                 with col2:
-                    if st.button("🔍 Check Sync Health", use_container_width=True):
+                    if st.button("🔍 Check Sync Health", key=f"check_sync_health_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.success("All nodes synchronized!")
                 
                 with col3:
-                    if st.button("⚙️ Configure AG", use_container_width=True):
+                    if st.button("⚙️ Configure AG", key=f"configure_ag_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.info("Opening AG configuration...")
                 
                 with col4:
-                    if st.button("📊 View Metrics", use_container_width=True):
+                    if st.button("📊 View Metrics", key=f"view_metrics_{st.session_state.db_ops_session_id}", use_container_width=True):
                         st.info("Opening performance metrics...")
         
         else:
